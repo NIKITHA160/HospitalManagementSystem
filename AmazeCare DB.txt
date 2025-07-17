@@ -1,0 +1,390 @@
+Enter password: *************
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 8
+Server version: 8.0.41 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use amazecare;
+Database changed
+mysql> show tables;
++---------------------+
+| Tables_in_amazecare |
++---------------------+
+| admin               |
+| appointment         |
+| consultation        |
+| doctors             |
+| hospitals           |
+| medical_records     |
+| patients            |
+| prescription        |
+| report_feedback     |
+| reschedule_log      |
+| test                |
+| userdata            |
++---------------------+
+12 rows in set (0.04 sec)
+
+mysql> desc admin;
++----------------+--------------+------+-----+-------------------+-------------------+
+| Field          | Type         | Null | Key | Default           | Extra             |
++----------------+--------------+------+-----+-------------------+-------------------+
+| admin_id       | int          | NO   | PRI | NULL              | auto_increment    |
+| full_name      | varchar(100) | NO   |     | NULL              |                   |
+| email_address  | varchar(100) | NO   | UNI | NULL              |                   |
+| login_password | varchar(255) | NO   |     | NULL              |                   |
+| contact_number | varchar(15)  | YES  |     | NULL              |                   |
+| registered_on  | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
++----------------+--------------+------+-----+-------------------+-------------------+
+6 rows in set (0.01 sec)
+
+mysql> select* from admin;
++----------+--------------+-----------------------------+----------------+----------------+---------------------+
+| admin_id | full_name    | email_address               | login_password | contact_number | registered_on       |
++----------+--------------+-----------------------------+----------------+----------------+---------------------+
+|        1 | Ramesh Gupta | ramesh.gupta@amazecare.com  | admin123       | 9876543210     | 2025-06-24 23:47:43 |
+|        2 | Divya Sharma | divya.sharma@cityhealth.com | admin123       | 9876543211     | 2025-06-24 23:47:43 |
+|        3 | Naveen Rao   | naveen.rao@wellness.com     | admin123       | 9876543212     | 2025-06-24 23:47:43 |
+|        4 | Nikki        | nikki@example.com           | nikki123       | 8919630749     | NULL                |
+|        8 | John Admin   | admin@example.com           | admin123       | 9876543210     | NULL                |
+|       11 | Nikki        | nikhitha@example.com        | nikki123       | 9876543210     | NULL                |
++----------+--------------+-----------------------------+----------------+----------------+---------------------+
+6 rows in set (0.03 sec)
+
+mysql> desc appointment;
++--------------------+-----------------------------------------------------+------+-----+---------+----------------+
+| Field              | Type                                                | Null | Key | Default | Extra          |
++--------------------+-----------------------------------------------------+------+-----+---------+----------------+
+| appointment_id     | int                                                 | NO   | PRI | NULL    | auto_increment |
+| patient_id         | int                                                 | YES  | MUL | NULL    |                |
+| doctor_id          | int                                                 | YES  | MUL | NULL    |                |
+| preferred_datetime | datetime                                            | YES  |     | NULL    |                |
+| symptoms           | varchar(255)                                        | YES  |     | NULL    |                |
+| nature_of_visit    | varchar(100)                                        | YES  |     | NULL    |                |
+| status             | enum('pending','confirmed','cancelled','completed') | YES  |     | pending |                |
++--------------------+-----------------------------------------------------+------+-----+---------+----------------+
+7 rows in set (0.00 sec)
+
+mysql> select* from appointment;
++----------------+------------+-----------+---------------------+-------------------+----------------------+-----------+
+| appointment_id | patient_id | doctor_id | preferred_datetime  | symptoms          | nature_of_visit      | status    |
++----------------+------------+-----------+---------------------+-------------------+----------------------+-----------+
+|              1 |          1 |         1 | 2025-07-08 15:30:00 | Fever, body pain  | General Consultation | cancelled |
+|              2 |          2 |         2 | 2025-06-11 11:30:00 | Skin rash         | Dermatology          | confirmed |
+|              3 |          3 |         3 | 2025-06-12 09:00:00 | Back pain         | Neurology            | completed |
+|              4 |          4 |         4 | 2025-06-13 15:00:00 | Irregular periods | Gynecology           | pending   |
+|              5 |          5 |         5 | 2025-06-14 14:00:00 | Ear pain          | ENT                  | cancelled |
+|              6 |          1 |         2 | 2025-07-07 21:00:00 | Cough and fever   | Routine Checkup      | pending   |
++----------------+------------+-----------+---------------------+-------------------+----------------------+-----------+
+6 rows in set (0.02 sec)
+
+mysql> desc consultation;
++------------------+--------------+------+-----+---------+----------------+
+| Field            | Type         | Null | Key | Default | Extra          |
++------------------+--------------+------+-----+---------+----------------+
+| consultation_id  | int          | NO   | PRI | NULL    | auto_increment |
+| appointment_id   | int          | YES  | UNI | NULL    |                |
+| symptoms         | varchar(255) | YES  |     | NULL    |                |
+| physical_details | text         | YES  |     | NULL    |                |
+| diagnosis        | varchar(255) | YES  |     | NULL    |                |
+| patient_id       | int          | YES  | MUL | NULL    |                |
+| doctor_id        | int          | YES  | MUL | NULL    |                |
+| appointmentId    | int          | NO   |     | NULL    |                |
+| doctorId         | int          | NO   |     | NULL    |                |
+| patientId        | int          | NO   |     | NULL    |                |
+| physicalDetails  | varchar(255) | YES  |     | NULL    |                |
++------------------+--------------+------+-----+---------+----------------+
+11 rows in set (0.00 sec)
+
+mysql> select* from consultation;
++-----------------+----------------+----------------------+------------------------+-------------+------------+-----------+---------------+----------+-----------+-----------------+
+| consultation_id | appointment_id | symptoms             | physical_details       | diagnosis   | patient_id | doctor_id | appointmentId | doctorId | patientId | physicalDetails |
++-----------------+----------------+----------------------+------------------------+-------------+------------+-----------+---------------+----------+-----------+-----------------+
+|               1 |              1 | Headache and fatigue | BP levels high         | Migraine    |       NULL |      NULL |             0 |        0 |         0 | NULL            |
+|               2 |              2 | Skin rashes          | Redness observed       | Allergy     |       NULL |      NULL |             0 |        0 |         0 | NULL            |
+|               3 |              3 | Dizziness            | Under observation      | Sinus issue |       NULL |      NULL |             0 |        0 |         0 | NULL            |
+|               4 |              4 | Irregular periods    | Pregnancy test advised | PCOD        |       NULL |      NULL |             0 |        0 |         0 | NULL            |
+|               5 |              5 | Hand pain            | Swelling found         | Arthritis   |       NULL |      NULL |             0 |        0 |         0 | NULL            |
++-----------------+----------------+----------------------+------------------------+-------------+------------+-----------+---------------+----------+-----------+-----------------+
+5 rows in set (0.01 sec)
+
+mysql> desc doctors;
++---------------------+--------------+------+-----+-------------------+-------------------+
+| Field               | Type         | Null | Key | Default           | Extra             |
++---------------------+--------------+------+-----+-------------------+-------------------+
+| doctor_id           | int          | NO   | PRI | NULL              | auto_increment    |
+| full_name           | varchar(100) | NO   |     | NULL              |                   |
+| department          | varchar(255) | YES  |     | NULL              |                   |
+| years_of_experience | int          | NO   |     | NULL              |                   |
+| qualification       | varchar(255) | YES  |     | NULL              |                   |
+| designation         | varchar(255) | YES  |     | NULL              |                   |
+| mobile_number       | varchar(15)  | YES  | UNI | NULL              |                   |
+| email_address       | varchar(100) | NO   | UNI | NULL              |                   |
+| login_password      | varchar(255) | NO   |     | NULL              |                   |
+| hospital_id         | int          | YES  | MUL | NULL              |                   |
+| registered_on       | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| emailAddress        | varchar(255) | YES  |     | NULL              |                   |
+| fullName            | varchar(255) | YES  |     | NULL              |                   |
+| mobileNumber        | varchar(255) | YES  |     | NULL              |                   |
++---------------------+--------------+------+-----+-------------------+-------------------+
+14 rows in set (0.01 sec)
+
+mysql> select* from doctors;
++-----------+------------------+-------------+---------------------+------------------+------------------------+---------------+-----------------------------+--------------------------------------------------------------+-------------+---------------------+--------------+----------+--------------+
+| doctor_id | full_name        | department  | years_of_experience | qualification    | designation            | mobile_number | email_address               | login_password                                               | hospital_id | registered_on       | emailAddress | fullName | mobileNumber |
++-----------+------------------+-------------+---------------------+------------------+------------------------+---------------+-----------------------------+--------------------------------------------------------------+-------------+---------------------+--------------+----------+--------------+
+|         1 | Dr. Amal         | Cardiology  |                  15 | MD (Cardiology)  | Senior Consultant      | 9998887871    | ramesh.gupta@amazecare.com  | password123                                                  |           1 | 2025-06-19 21:38:58 | NULL         | NULL     | NULL         |
+|         2 | Dr. Aarthi Menon | Dermatology |                  10 | MD (Dermatology) | Consultant             | 9998887772    | aarthi.menon@cityhealth.com | password123                                                  |           2 | 2025-06-19 21:38:58 | NULL         | NULL     | NULL         |
+|         3 | Dr. Sunil Rao    | Neurology   |                  12 | DM (Neurology)   | Associate Professor    | 9998887773    | sunil.rao@wellness.com      | password123                                                  |           3 | 2025-06-19 21:38:58 | NULL         | NULL     | NULL         |
+|         4 | Dr. Poornima C   | Gynecology  |                  18 | MS (OG)          | Associate Professor    | 9998887774    | poornima.c@amazecare.com    | password123                                                  |           1 | 2025-06-19 21:38:58 | NULL         | NULL     | NULL         |
+|         5 | Dr. Naveen Jain  | ENT         |                   8 | MS (ENT)         | Junior Consultant      | 9998887775    | naveen.jain@cityhealth.com  | password123                                                  |           2 | 2025-06-19 21:38:58 | NULL         | NULL     | NULL         |
+|         6 | Dr. Nikhitha     | Cardiology  |                  15 | MD (Cardiology)  | Senior Consultant      | 123455665     | nikki@amazecare.com         | password123                                                  |           1 | NULL                | NULL         | NULL     | NULL         |
+|        18 | Dr. Mary C       | Gynecology  |                  18 | MS (OG)          | Associate Professor    | 9998787774    | mary.c@amazecare.com        | password123                                                  |           1 | NULL                | NULL         | NULL     | NULL         |
+|        19 | Dr. Alice        | Cardiology  |                  10 | MD               | Senior Consultant      | 9123456780    | alice@hospital.com          | doctor123                                                    |           1 | NULL                | NULL         | NULL     | NULL         |
+|        20 | Dr. Jane Smith   | Neurology   |                  12 | MBBS, MD (Neuro) | Consultant Neurologist | 9876543210    | jane.smith@hospital.com     | $2a$10$RiJgPmguhiG5CbWD0kDhDeTWg8I5cVMfq3.HJolkAG8HtXWlUfX/m |           1 | 2025-07-06 17:30:00 | NULL         | NULL     | NULL         |
++-----------+------------------+-------------+---------------------+------------------+------------------------+---------------+-----------------------------+--------------------------------------------------------------+-------------+---------------------+--------------+----------+--------------+
+9 rows in set (0.02 sec)
+
+mysql> desc hospitals;
++----------------+--------------+------+-----+-------------------+-------------------+
+| Field          | Type         | Null | Key | Default           | Extra             |
++----------------+--------------+------+-----+-------------------+-------------------+
+| hospital_id    | int          | NO   | PRI | NULL              | auto_increment    |
+| hospital_name  | varchar(100) | NO   |     | NULL              |                   |
+| city_name      | varchar(100) | YES  |     | NULL              |                   |
+| location_area  | varchar(100) | YES  |     | NULL              |                   |
+| contact_number | varchar(15)  | YES  |     | NULL              |                   |
+| registered_on  | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| cityName       | varchar(255) | YES  |     | NULL              |                   |
+| contactNumber  | varchar(255) | YES  |     | NULL              |                   |
+| hospitalName   | varchar(255) | YES  |     | NULL              |                   |
+| locationArea   | varchar(255) | YES  |     | NULL              |                   |
++----------------+--------------+------+-----+-------------------+-------------------+
+10 rows in set (0.00 sec)
+
+mysql> select* from hospitals;
++-------------+----------------------------+-----------+---------------+----------------+---------------------+----------+---------------+--------------+--------------+
+| hospital_id | hospital_name              | city_name | location_area | contact_number | registered_on       | cityName | contactNumber | hospitalName | locationArea |
++-------------+----------------------------+-----------+---------------+----------------+---------------------+----------+---------------+--------------+--------------+
+|           1 | AmazeCare Multi Speciality | Hyderabad | Banjara Hills | 0401234567     | 2025-06-19 21:37:48 | NULL | NULL          | NULL         | NULL         |
+|           2 | City Health Hospital       | Chennai   | t-nagar       | 0447654321     | 2025-06-19 21:37:48 | NULL | NULL          | NULL         | NULL         |
+|           3 | Wellness Centre            | Bangalore | Indiranagar   | 0801234987     | 2025-06-19 21:37:48 | NULL | NULL          | NULL         | NULL         |
+|           4 | City Health Hospital       | Chennai   | T. Nagar      | 0447654321     | NULL                | NULL | NULL          | NULL         | NULL         |
+|           5 | AmazeCare Multi Speciality | Hyderabad | Banjara Hills | 0401234567     | NULL                | NULL | NULL          | NULL         | NULL         |
+|           6 | City Care Hospital         | Bangalore | Indiranagar   | 9876543210     | 2025-07-06 18:00:00 | NULL | NULL          | NULL         | NULL         |
++-------------+----------------------------+-----------+---------------+----------------+---------------------+----------+---------------+--------------+--------------+
+6 rows in set (0.01 sec)
+
+mysql> desc medical_records;
++-----------------+--------------+------+-----+---------+----------------+
+| Field           | Type         | Null | Key | Default | Extra          |
++-----------------+--------------+------+-----+---------+----------------+
+| record_id       | int          | NO   | PRI | NULL    | auto_increment |
+| appointment_id  | int          | YES  | MUL | NULL    |                |
+| diagnosis       | varchar(255) | YES  |     | NULL    |                |
+| prescription_id | int          | YES  | MUL | NULL    |                |
+| patient_id      | int          | YES  | MUL | NULL    |                |
++-----------------+--------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> select* from medical_records;
++-----------+----------------+--------------+-----------------+------------+
+| record_id | appointment_id | diagnosis    | prescription_id | patient_id |
++-----------+----------------+--------------+-----------------+------------+
+|         1 |              1 | Migraine     |               1 |       NULL |
+|         2 |              2 | Allergy      |               2 |       NULL |
+|         3 |              3 | Sinus        |               3 |       NULL |
+|         4 |              4 | PCOD         |               4 |       NULL |
+|         5 |              5 | Arthritis    |               5 |       NULL |
+|         7 |              2 | Hypertension |               3 |          1 |
++-----------+----------------+--------------+-----------------+------------+
+6 rows in set (0.01 sec)
+
+mysql> desc patients;
++---------------------+--------------+------+-----+-------------------+-------------------+
+| Field               | Type         | Null | Key | Default           | Extra             |
++---------------------+--------------+------+-----+-------------------+-------------------+
+| patient_id          | int          | NO   | PRI | NULL              | auto_increment    |
+| full_name           | varchar(100) | NO   |     | NULL              |                   |
+| date_of_birth       | date         | NO   |     | NULL              |                   |
+| gender              | varchar(255) | YES  |     | NULL              |                   |
+| mobile_number       | varchar(15)  | NO   | UNI | NULL              |                   |
+| email_address       | varchar(100) | NO   | UNI | NULL              |                   |
+| login_password      | varchar(255) | NO   |     | NULL              |                   |
+| residential_address | text         | YES  |     | NULL              |                   |
+| registered_on       | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| dateOfBirth         | date         | YES  |     | NULL              |                   |
+| emailAddress        | varchar(255) | YES  |     | NULL              |                   |
+| fullName            | varchar(255) | YES  |     | NULL              |                   |
+| loginPassword       | varchar(255) | YES  |     | NULL              |                   |
+| mobileNumber        | varchar(255) | YES  |     | NULL              |                   |
+| residentialAddress  | varchar(255) | YES  |     | NULL              |                   |
+| is_admitted         | tinyint(1)   | YES  |     | 0                 |                   |
++---------------------+--------------+------+-----+-------------------+-------------------+
+16 rows in set (0.00 sec)
+
+mysql> select* from patients;
++------------+------------------+---------------+--------+---------------+-----------------------+----------------+-----------------------+---------------------+-------------+--------------+----------+---------------+--------------+--------------------+-------------+
+| patient_id | full_name        | date_of_birth | gender | mobile_number | email_address         | login_password | residential_address   | registered_on       | dateOfBirth | emailAddress | fullName | loginPassword | mobileNumber | residentialAddress | is_admitted |
++------------+------------------+---------------+--------+---------------+-----------------------+----------------+-----------------------+---------------------+-------------+--------------+----------+---------------+--------------+--------------------+-------------+
+|          1 | Jane Doe Updated | 1985-03-15    | Female | 9123456789    | jane.doe@example.com  | securepass123  | 456Maple Avenue      | 2025-06-19 21:39:09 | NULL        | NULL         | NULL     | NULL          | NULL         | NULL            |           1 |
+|          2 | Priya Reddy      | 1992-08-25    | Female | 9876512345    | priya.reddy@gmail.com | pass123        | Chennai, Tamil Nadu   | 2025-06-19 21:39:09 | NULL        | NULL         | NULL     | NULL          | NULL         | NULL            |           0 |
+|          3 | Kiran Kumar      | 1988-01-15    | Male   | 9876523456    | kiran.kumar@gmail.com | pass123        | Bangalore, Karnataka  | 2025-06-19 21:39:09 | NULL        | NULL         | NULL     | NULL          | NULL         | NULL            |           0 |
+|          4 | Latha Devi       | 1995-06-30    | Female | 9876534567    | latha.devi@gmail.com  | pass123        | Hyderabad, Telangana  | 2025-06-19 21:39:09 | NULL        | NULL         | NULL     | NULL          | NULL         | NULL            |           0 |
+|          5 | Sai              | 1993-11-20    | Male   | 9846545678    | saity@email.com       | password123    | Hyderabad             | 2025-06-19 21:39:09 | NULL        | NULL         | NULL     | NULL          | NULL         | NULL            |           0 |
+|          8 | Ravi Teja        | 1993-11-20    | Male   | 9876545078    | saiteja@email.com     | password123    | Hyderabad             | NULL                | NULL        | NULL         | NULL     | NULL          | NULL         | NULL            |           0 |
+|         10 | Sai              | 1993-11-20    | Male   | 9876545678    | sai@email.com         | password123    | Hyderabad             | NULL                | NULL        | NULL         | NULL     | NULL          | NULL         | NULL            |           0 |
+|         12 | John Doe         | 1990-05-20    | Male   | 987643210     | johndoe@example.com   | password123    | 123Main Street, City | 2025-07-06 19:15:00 | NULL        | NULL         | NULL     | NULL          | NULL         | NULL            |           0 |
++------------+------------------+---------------+--------+---------------+-----------------------+----------------+-----------------------+---------------------+-------------+--------------+----------+---------------+--------------+--------------------+-------------+
+8 rows in set (0.02 sec)
+
+mysql> desc prescription;
++-----------------+--------------+------+-----+---------+----------------+
+| Field           | Type         | Null | Key | Default | Extra          |
++-----------------+--------------+------+-----+---------+----------------+
+| prescription_id | int          | NO   | PRI | NULL    | auto_increment |
+| appointment_id  | int          | YES  | UNI | NULL    |                |
+| medicines       | varchar(255) | YES  |     | NULL    |                |
+| dosage          | varchar(255) | YES  |     | NULL    |                |
+| notes           | varchar(255) | YES  |     | NULL    |                |
+| patient_id      | int          | YES  | MUL | NULL    |                |
+| doctor_id       | int          | YES  | MUL | NULL    |                |
+| appointmentId   | int          | NO   |     | NULL    |                |
+| doctorId        | int          | YES  |     | NULL    |                |
+| patientId       | int          | YES  |     | NULL    |                |
++-----------------+--------------+------+-----+---------+----------------+
+10 rows in set (0.00 sec)
+
+mysql> select* from prescription;
++-----------------+----------------+-------------+--------+-------------+------------+-----------+---------------+----------+-----------+
+| prescription_id | appointment_id | medicines   | dosage | notes       | patient_id | doctor_id | appointmentId | doctorId | patientId |
++-----------------+----------------+-------------+--------+-------------+------------+-----------+---------------+----------+-----------+
+|               1 |              1 | Paracetamol | 1-0-1  | After Food  |       NULL |      NULL |             0 |     NULL |      NULL |
+|               2 |              2 | Cetirizine  | 0-1-0  | Before Food |       NULL |      NULL |             0 |     NULL |      NULL |
+|               3 |              3 | Naproxen    | 1-1-1  | After Food  |       NULL |      NULL |             0 |     NULL |      NULL |
+|               4 |              4 | Metformin   | 1-0-1  | Before Food |       NULL |      NULL |             0 |     NULL |      NULL |
+|               5 |              5 | Ibuprofen   | 0-0-1  | After Food  |       NULL |      NULL |             0 |     NULL |      NULL |
++-----------------+----------------+-------------+--------+-------------+------------+-----------+---------------+----------+-----------+
+5 rows in set (0.01 sec)
+
+mysql> desc report_feedback;
++-------------+--------------+------+-----+-------------------+-------------------+
+| Field       | Type         | Null | Key | Default           | Extra             |
++-------------+--------------+------+-----+-------------------+-------------------+
+| feedback_id | int          | NO   | PRI | NULL              | auto_increment    |
+| patient_id  | int          | YES  |     | NULL              |                   |
+| doctor_id   | int          | YES  |     | NULL              |                   |
+| admin_id    | int          | YES  |     | NULL              |                   |
+| content     | varchar(255) | YES  |     | NULL              |                   |
+| created_at  | timestamp    | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| adminId     | int          | YES  |     | NULL              |                   |
+| doctorId    | int          | YES  |     | NULL              |                   |
+| patientId   | int          | YES  |     | NULL              |                   |
++-------------+--------------+------+-----+-------------------+-------------------+
+9 rows in set (0.01 sec)
+
+mysql> select* from report_feedback;
+Empty set (0.01 sec)
+
+mysql> desc reschedule_log;
++----------------+----------------------------------+------+-----+-------------------+-------------------+
+| Field          | Type                             | Null | Key | Default           | Extra             |
++----------------+----------------------------------+------+-----+-------------------+-------------------+
+| log_id         | int                              | NO   | PRI | NULL              | auto_increment    |
+| appointment_id | int                              | YES  | MUL | NULL              |                   |
+| old_datetime   | datetime                         | YES  |     | NULL              |                   |
+| new_datetime   | datetime                         | YES  |     | NULL              |                   |
+| changed_by     | enum('patient','doctor','admin') | YES  |     | NULL              |                   |
+| changed_at     | timestamp                        | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED |
+| patient_id     | int                              | YES  | MUL | NULL              |                   |
+| doctor_id      | int                              | YES  | MUL | NULL              |                   |
+| appointmentId  | int                              | NO   |     | NULL              |                   |
+| changedBy      | enum('admin','doctor','patient') | YES  |     | NULL              |                   |
+| doctorId       | int                              | YES  |     | NULL              |                   |
+| newDatetime    | datetime(6)                      | YES  |     | NULL              |                   |
+| oldDatetime    | datetime(6)                      | YES  |     | NULL              |                   |
+| patientId      | int                              | YES  |     | NULL              |                   |
++----------------+----------------------------------+------+-----+-------------------+-------------------+
+14 rows in set (0.00 sec)
+
+mysql> select* from reschedfule_log;
+ERROR 1146 (42S02): Table 'amazecare.reschedfule_log' doesn't exist
+mysql> select* from rescheddule_log;
+ERROR 1146 (42S02): Table 'amazecare.rescheddule_log' doesn't exist
+mysql> select* from reschedule_log;
++--------+----------------+---------------------+---------------------+------------+---------------------+------------+-----------+---------------+-----------+----------+-------------+-------------+-----------+
+| log_id | appointment_id | old_datetime        | new_datetime        | changed_by | changed_at          | patient_id |doctor_id | appointmentId | changedBy | doctorId | newDatetime | oldDatetime | patientId |
++--------+----------------+---------------------+---------------------+------------+---------------------+------------+-----------+---------------+-----------+----------+-------------+-------------+-----------+
+|      1 |              1 | 2025-06-10 10:00:00 | 2025-06-11 10:00:00 | patient    | 2025-06-02 23:18:21 |       NULL |     NULL |             0 | NULL      |     NULL | NULL        | NULL        |      NULL |
+|      2 |              2 | 2025-06-11 11:30:00 | 2025-06-12 11:00:00 | doctor     | 2025-06-02 23:18:21 |       NULL |     NULL |             0 | NULL      |     NULL | NULL        | NULL        |      NULL |
+|      3 |              3 | 2025-06-12 09:00:00 | 2025-06-12 10:00:00 | admin      | 2025-06-02 23:18:21 |       NULL |     NULL |             0 | NULL      |     NULL | NULL        | NULL        |      NULL |
+|      4 |              4 | 2025-06-13 15:00:00 | 2025-06-13 16:00:00 | doctor     | 2025-06-02 23:18:21 |       NULL |     NULL |             0 | NULL      |     NULL | NULL        | NULL        |      NULL |
+|      5 |              5 | 2025-06-14 14:00:00 | 2025-06-15 14:30:00 | patient    | 2025-06-02 23:18:21 |       NULL |     NULL |             0 | NULL      |     NULL | NULL        | NULL        |      NULL |
++--------+----------------+---------------------+---------------------+------------+---------------------+------------+-----------+---------------+-----------+----------+-------------+-------------+-----------+
+5 rows in set (0.02 sec)
+
+mysql> desc test;
++----------------+-----------------------------------------------------+------+-----+---------+----------------+
+| Field          | Type                                                | Null | Key | Default | Extra          |
++----------------+-----------------------------------------------------+------+-----+---------+----------------+
+| test_id        | int                                                 | NO   | PRI | NULL    | auto_increment |
+| appointment_id | int                                                 | YES  | MUL | NULL    |                |
+| name           | varchar(255)                                        | YES  |     | NULL    |                |
+| status         | enum('pending','confirmed','cancelled','completed') | YES  |     | pending |                |
+| uploaded_scan  | text                                                | YES  |     | NULL    |                |
+| patient_id     | int                                                 | YES  | MUL | NULL    |                |
+| doctor_id      | int                                                 | YES  | MUL | NULL    |                |
+| appointmentId  | int                                                 | NO   |     | NULL    |                |
+| doctorId       | int                                                 | YES  |     | NULL    |                |
+| patientId      | int                                                 | YES  |     | NULL    |                |
+| uploadedScan   | varchar(255)                                        | YES  |     | NULL    |                |
++----------------+-----------------------------------------------------+------+-----+---------+----------------+
+11 rows in set (0.00 sec)
+
+mysql> select* from test;
++---------+----------------+------------+-----------+---------------+------------+-----------+---------------+----------+-----------+--------------+
+| test_id | appointment_id | name       | status    | uploaded_scan | patient_id | doctor_id | appointmentId | doctorId| patientId | uploadedScan |
++---------+----------------+------------+-----------+---------------+------------+-----------+---------------+----------+-----------+--------------+
+|       1 |              1 | Blood Test | pending   |               |       NULL |      NULL |             0 |     NULL|      NULL | NULL         |
+|       2 |              2 | Skin Scan  | completed | scan1.jpg     |       NULL |      NULL |             0 |     NULL|      NULL | NULL         |
+|       3 |              3 | MRI        | confirmed | scan2.jpg     |       NULL |      NULL |             0 |     NULL|      NULL | NULL         |
+|       4 |              4 | Ultrasound | pending   |               |       NULL |      NULL |             0 |     NULL|      NULL | NULL         |
+|       5 |              5 | Ear Check  | cancelled |               |       NULL |      NULL |             0 |     NULL|      NULL | NULL         |
++---------+----------------+------------+-----------+---------------+------------+-----------+---------------+----------+-----------+--------------+
+5 rows in set (0.01 sec)
+
+mysql> desc userdata;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| uid      | int          | NO   | PRI | NULL    | auto_increment |
+| email    | varchar(255) | YES  | UNI | NULL    |                |
+| name     | varchar(255) | YES  |     | NULL    |                |
+| password | varchar(255) | YES  |     | NULL    |                |
+| roles    | varchar(255) | YES  |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
+
+mysql> select* from userdata;
++-----+-------------------------+----------------+--------------------------------------------------------------+--------------+
+| uid | email                   | name           | password                                                     | roles       |
++-----+-------------------------+----------------+--------------------------------------------------------------+--------------+
+|   1 | admin@example.com       | Admin User     | $2a$10$B2bp.xmAvGmsuwPCH4emoOYi2VvtGiLQfhgBjaAoGUIKxaqxQyjYy | ROLE_ADMIN   |
+|   2 | doctor@example.com      | Dr. Smith      | $2a$10$KlPfo4pRgfoD4oWzdNQHGu3n4B804QV3xRzp4lSv6V.wD2OS4.Kie | ROLE_DOCTOR  |
+|   3 | patient@example.com     | Patient A      | $2a$10$h0JgTTmW2J/F7tQLSnYsveq4qrJIxKqLmlnGDBu1ciP/h/Ytn8RqC | ROLE_PATIENT |
+|   4 | john.doe@example.com    | John Doe       | $2a$10$bttaKrZTdPIGnJz6K.1nieGAc2EHRFWNBx.Wx39cJ7Bk7M4R7oxk. | ROLE_PATIENT |
+|  14 | jane.smith@hospital.com | Dr. Jane Smith | $2a$10$RiJgPmguhiG5CbWD0kDhDeTWg8I5cVMfq3.HJolkAG8HtXWlUfX/m | ROLE_DOCTOR  |
+|  15 | testuser@example.com    | testuser       | $2a$10$HPQbVFbxRpvVE0c4PToEz.qW2h6VpSY.zWZz2rYI4ya8QjOxNTlQS | ROLE_USER    |
+|  17 | nikki@example.com       | nikki          | $2a$10$173ZGihiGE4nF1qw3Our8.P5EN7XqRaj.COWNCzBWRgUq5PEl9mn. | ROLE_USER    |
+|  18 | johndoe@example.com     | John Doe       | $2a$10$8ilILtTwdvS08nEuJNBHlerKH0/2K/DKdBrX5trdZYLCjXzskce8i | ROLE_USER    |
++-----+-------------------------+----------------+--------------------------------------------------------------+--------------+
+8 rows in set (0.02 sec)
+
+mysql>
